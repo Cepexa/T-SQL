@@ -1,7 +1,7 @@
-use Sports_Shop
+п»їuse Sports_Shop
 go
 
---создаем триггер, который При продаже товара, заносит информацию о продаже в таблицу «История» 
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РџСЂРё РїСЂРѕРґР°Р¶Рµ С‚РѕРІР°СЂР°, Р·Р°РЅРѕСЃРёС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїСЂРѕРґР°Р¶Рµ РІ С‚Р°Р±Р»РёС†Сѓ В«РСЃС‚РѕСЂРёСЏВ» 
 create trigger sports.trHistoryEntry
 on sports.table_sale
 for insert, update
@@ -11,7 +11,7 @@ begin
 	  RETURN
 	  SET NOCOUNT ON
 	   
-	  IF exists (select * from sports.table_sale where (status_sale = 'Выполнен') or (status_sale = 'Отменён'))				  
+	  IF exists (select * from sports.table_sale where (status_sale = 'Р’С‹РїРѕР»РЅРµРЅ') or (status_sale = 'РћС‚РјРµРЅС‘РЅ'))				  
 		insert into sports.table_history_sale (product_id,date_of_sale,quantity_sale,
 												sale_price, id_seller, id_client,status_sale)
 		values 
@@ -23,13 +23,13 @@ begin
 			(select id_client from inserted),
 			(select status_sale from inserted))
 	
-		DELETE FROM sports.table_sale where (status_sale = 'Выполнен') or (status_sale = 'Отменён')
+		DELETE FROM sports.table_sale where (status_sale = 'Р’С‹РїРѕР»РЅРµРЅ') or (status_sale = 'РћС‚РјРµРЅС‘РЅ')
 end
 go
 
---создаем триггер, который
---Если после продажи товара не осталось ни одной единицы данного товара, переносит информацию 
---о полностью проданном товаре в таблицу «Архив»
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№
+--Р•СЃР»Рё РїРѕСЃР»Рµ РїСЂРѕРґР°Р¶Рё С‚РѕРІР°СЂР° РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ РЅРё РѕРґРЅРѕР№ РµРґРёРЅРёС†С‹ РґР°РЅРЅРѕРіРѕ С‚РѕРІР°СЂР°, РїРµСЂРµРЅРѕСЃРёС‚ РёРЅС„РѕСЂРјР°С†РёСЋ 
+--Рѕ РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕРґР°РЅРЅРѕРј С‚РѕРІР°СЂРµ РІ С‚Р°Р±Р»РёС†Сѓ В«РђСЂС…РёРІВ»
 create trigger sports.ArchiveEntry
 on sports.table_product
 for insert, update
@@ -57,7 +57,7 @@ begin
 end
 go
 
---создаем триггер, который вычитает количество купленного товара
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РІС‹С‡РёС‚Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РєСѓРїР»РµРЅРЅРѕРіРѕ С‚РѕРІР°СЂР°
 create trigger trCountProductInsert
 on sports.table_sale
 for insert
@@ -72,7 +72,7 @@ begin
 		inner join sports.table_product k
 			on k.quantity_in_stock < i.quantity_sale where k.id_prod = i.id_product)
 		begin
-			RAISERROR ('Данное количество отсутвует', 12,1)
+			RAISERROR ('Р”Р°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚СЃСѓС‚РІСѓРµС‚', 12,1)
 			ROLLBACK
 			RETURN
 		end
@@ -83,7 +83,7 @@ begin
 	where id_prod = i.id_product
 end
 go
---создаем триггер, который вычитает количество купленного товара при update
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РІС‹С‡РёС‚Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РєСѓРїР»РµРЅРЅРѕРіРѕ С‚РѕРІР°СЂР° РїСЂРё update
 create trigger trCountProductUpdate
 on sports.table_sale
 for update
@@ -98,7 +98,7 @@ begin
 		inner join sports.table_product k
 			on k.quantity_in_stock < i.quantity_sale where k.id_prod = i.id_product)
 		begin
-			RAISERROR ('Данное количество отсутвует', 12,1)
+			RAISERROR ('Р”Р°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚СЃСѓС‚РІСѓРµС‚', 12,1)
 			ROLLBACK
 			RETURN
 		end
@@ -109,7 +109,7 @@ begin
 	where id_prod = i.id_product
 end
 go
---создаем триггер, который при удалении не выполненой продажи возвращает исходное количество товаров
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РїСЂРё СѓРґР°Р»РµРЅРёРё РЅРµ РІС‹РїРѕР»РЅРµРЅРѕР№ РїСЂРѕРґР°Р¶Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РёСЃС…РѕРґРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РѕРІР°СЂРѕРІ
 create trigger sports.trDeleteString
 on sports.table_sale
 for delete
@@ -117,15 +117,15 @@ as
 	update sports.table_product
 	set quantity_in_stock = quantity_in_stock + d.quantity_sale
 	from deleted d 
-	where (id_prod = d.id_product) and (d.status_sale <> ('Выполнен'))
-	--обновить таблицу о товарах нужно в любом случае (это для того чтобы при значении 0  данные улетали в архив)
+	where (id_prod = d.id_product) and (d.status_sale <> ('Р’С‹РїРѕР»РЅРµРЅ'))
+	--РѕР±РЅРѕРІРёС‚СЊ С‚Р°Р±Р»РёС†Сѓ Рѕ С‚РѕРІР°СЂР°С… РЅСѓР¶РЅРѕ РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ (СЌС‚Рѕ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РїСЂРё Р·РЅР°С‡РµРЅРёРё 0  РґР°РЅРЅС‹Рµ СѓР»РµС‚Р°Р»Рё РІ Р°СЂС…РёРІ)
 	update sports.table_product
 	set quantity_in_stock = quantity_in_stock
 	from deleted d 
-	where (id_prod = d.id_product) and (d.status_sale = ('Выполнен'))
+	where (id_prod = d.id_product) and (d.status_sale = ('Р’С‹РїРѕР»РЅРµРЅ'))
 go
---создаем триггер, который Не позволять регистрировать уже существующего клиента.
---При вставке проверяет наличие клиента по email (ФИО может повторяться)
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РќРµ РїРѕР·РІРѕР»СЏС‚СЊ СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РєР»РёРµРЅС‚Р°.
+--РџСЂРё РІСЃС‚Р°РІРєРµ РїСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РєР»РёРµРЅС‚Р° РїРѕ email (Р¤РРћ РјРѕР¶РµС‚ РїРѕРІС‚РѕСЂСЏС‚СЊСЃСЏ)
 create trigger sports.trCheckFullName
 on sports.table_clients 
 for insert, update
@@ -140,24 +140,24 @@ begin
 				WHERE inserted.email = sports.table_clients.email and 
 				inserted.id_client <> sports.table_clients.id_client)
 		begin
-			RAISERROR ('Пользователь с таким email уже существует', 10,2)
+			RAISERROR ('РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј email СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚', 10,2)
 			ROLLBACK
 		end
 end
 go
 
---создаем триггер, который Запрещает удаление существующих клиентов
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ Р—Р°РїСЂРµС‰Р°РµС‚ СѓРґР°Р»РµРЅРёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёС… РєР»РёРµРЅС‚РѕРІ
 create trigger sports.trProhibitDel
 on sports.table_clients 
 for delete
 as
 begin
-	RAISERROR ('Запрет на удаление Пользователя', 5,1)
+	RAISERROR ('Р—Р°РїСЂРµС‚ РЅР° СѓРґР°Р»РµРЅРёРµ РџРѕР»СЊР·РѕРІР°С‚РµР»СЏ', 5,1)
 	ROLLBACK
 end
 go
 
---создаем триггер, который Запрещает удаление сотрудников, принятых на работу до 2015 года
+--СЃРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ Р—Р°РїСЂРµС‰Р°РµС‚ СѓРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ, РїСЂРёРЅСЏС‚С‹С… РЅР° СЂР°Р±РѕС‚Сѓ РґРѕ 2015 РіРѕРґР°
 
 create trigger sports.trProhibitDelEmployee
 on sports.table_employee
@@ -167,7 +167,7 @@ as
 	IF exists(SELECT * FROM deleted 
 				WHERE deleted.date_of_employment < '01-01-2015')
 	begin
-		RAISERROR ('Запрет на удаление сотрудника, принятого на работу до 2015 года', 5,1)
+		RAISERROR ('Р—Р°РїСЂРµС‚ РЅР° СѓРґР°Р»РµРЅРёРµ СЃРѕС‚СЂСѓРґРЅРёРєР°, РїСЂРёРЅСЏС‚РѕРіРѕ РЅР° СЂР°Р±РѕС‚Сѓ РґРѕ 2015 РіРѕРґР°', 5,1)
 		ROLLBACK
 	end
 go
