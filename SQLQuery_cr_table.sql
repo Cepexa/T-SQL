@@ -136,7 +136,7 @@ create table sports.table_history_sale(
 	product_id int default(0) not null,
 	date_of_sale date default(GETDATE()) not null,
 	quantity_sale int default(0) not null,
-	sale_price int default(0) not null,
+	sale_price money default(0) not null,
 	id_seller int default(0) not null,
 	id_client int default(0) not null,
 	status_sale nvarchar(20) default('Выполнен') null
@@ -150,21 +150,32 @@ create table sports.table_archive(
 	product_name nvarchar(30) null,
 	type_product nvarchar(30) null,
 	manufacturer nvarchar(30) null,
-	cost_price int null,
+	cost_price money null,
+	date_of_transfer date default(GETDATE()) not null
+)
+go
+--создаём таблицу Последняя единица
+create table sports.table_last_unit(
+	id_last_unit int identity(1,1) primary key,
+	product_id int not null,
+	product_name nvarchar(30) not null,
+	type_product nvarchar(30) not null,
+	manufacturer nvarchar(30) not null,
+	cost_price money not null,
+	selling_price money not null,
 	date_of_transfer date default(GETDATE()) not null
 )
 go
 
-
 insert into sports.table_product(name_product,type_product,
-								quantity_in_stock,last_unit,
+								quantity_in_stock,
 								cost_price,selling_price,manufacturer) 
 values
-('Кроссовки','Обувь', 10,0,1000,3000,'adidas'),
-('Бейсболка','Одежда',20,0,700, 2500,'nike'),
-('Носки',    'Одежда',25,0,550, 1500,'GUCCI'),
-('Футболка', 'Одежда',19,0,1200,3200,'reebok'),
-('Бутсы',    'Обувь', 31,0,600, 2800,'puma')
+('Кроссовки','Обувь', 10,1000,3000,'adidas'),
+('Бейсболка','Одежда',20,700, 2500,'nike'),
+('Носки',    'Одежда',25,550, 1500,'GUCCI'),
+('Футболка', 'Одежда',19,1200,3200,'reebok'),
+('Бутсы',    'Обувь', 31,600, 2800,'puma')
 go
 
 update sports.table_product

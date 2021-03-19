@@ -158,7 +158,6 @@ end
 go
 
 --создаем триггер, который Запрещает удаление сотрудников, принятых на работу до 2015 года
-
 create trigger sports.trProhibitDelEmployee
 on sports.table_employee
 for delete
@@ -170,4 +169,87 @@ as
 		RAISERROR ('Запрет на удаление сотрудника, принятого на работу до 2015 года', 5,1)
 		ROLLBACK
 	end
+go
+
+--создаем триггер, который . При новой покупке товара нужно проверяет общую сумму покупок клиента. 
+--Если сумма превысила 50000, устанавливает процент скидки в 15%
+create trigger sports.trSetDiscount
+on sports.table_sale
+for insert, update
+as
+	IF @@ROWCOUNT = 0
+	  RETURN
+	  SET NOCOUNT ON
+	   
+	IF exists(select * from sports.table_history_sale where
+				(SELECT sum(sale_price) FROM sports.table_history_sale 
+				WHERE status_sale = 'Выполнен' and id_client = (select id_client from inserted)) > 50000)
+	begin
+		UPDATE sports.table_clients
+		set discount_percentage = 15
+		from inserted i join sports.table_clients k 
+		on k.id_client = i.id_client
+		where k.id_client = i.id_client
+	end
+go
+
+--создаем триггер, который Запрещает добавлять товар конкретной фирмы. 
+--Например, товар фирмы «Спорт, солнце и штанга»
+create trigger sports.trProhibitAddFirm
+on sports.table_product
+for insert, update
+as
+	IF exists(SELECT * FROM inserted 
+				WHERE manufacturer = 'Спорт, солнце и штанга')
+	begin
+		RAISERROR ('Запрет на добавление товаров данной ФИРМЫ', 9,2)
+		ROLLBACK
+	end
+go
+
+--создаем триггер, который При продаже проверяет количество товара в наличии. 
+--Если осталась одна единица товара, внесит информацию об этом товаре в таблицу «Последняя Единица».
+create trigger sports.trCheckLastUnit
+on sports.table_product
+for insert, update
+as
+	IF exists(SELECT * FROM inserted 
+				WHERE quantity_in_stock = 1)
+	begin
+		insert into sports.table_last_unit (product_id,product_name, type_product,
+										manufacturer, cost_price, selling_price)
+		values ((select id_prod from inserted),
+				(select name_product from inserted),
+				(select type_product from inserted),
+				(select manufacturer from inserted),
+				 (select cost_price from inserted),
+				 (select selling_price from inserted))
+	end
+	else
+	begin
+		DECLARE @key AS int
+		SELECT @key = MIN(id_prod) FROM inserted
+		WHILE @key IS NOT NULL
+		BEGIN
+			IF exists(SELECT * FROM sports.table_last_unit
+				WHERE product_id =  @key)
+			begin
+				delete FROM sports.table_last_unit WHERE product_id = (select id_prod from inserted)
+			end
+  
+		SELECT @key = MIN(id_prod) FROM inserted
+		 WHERE id_prod > @key
+		END
+	end
+	
+go
+--создаем триггер, который при удалении продукта очищает и табл последняя единица с этим id
+create trigger sports.trCheckLastUnitDel
+on sports.table_product
+for delete
+as 
+	if exists (select * from sports.table_last_unit,deleted
+		where sports.table_last_unit.product_id = deleted.id_prod)
+		delete from sports.table_last_unit where product_id = (select id_prod from deleted)
+
 go
