@@ -13,7 +13,8 @@ begin
 	   
 	  IF exists (select * from sports.table_sale where (status_sale = 'Выполнен') or (status_sale = 'Отменён'))				  
 		insert into sports.table_history_sale (product_id,date_of_sale,quantity_sale,
-												sale_price, id_seller, id_client,status_sale)
+												sale_price, id_seller, id_client,status_sale,
+												manufacturer)
 		values 
 			((select id_product from inserted),
 			(select date_of_sale from inserted),
@@ -21,7 +22,9 @@ begin
 			(select sale_price from inserted),
 			(select id_seller from inserted),
 			(select id_client from inserted),
-			(select status_sale from inserted))
+			(select status_sale from inserted),
+			(select manufacturer from sports.table_product where id_prod =
+					(select id_product from inserted)))
 	
 		DELETE FROM sports.table_sale where (status_sale = 'Выполнен') or (status_sale = 'Отменён')
 end
@@ -92,11 +95,11 @@ begin
 	  IF @@ROWCOUNT = 0
 	  RETURN
 	  SET NOCOUNT ON
-	
 	 IF exists(select * 
-		from inserted i
+		from  inserted i
 		inner join sports.table_product k
-			on k.quantity_in_stock < i.quantity_sale where k.id_prod = i.id_product)
+			on k.quantity_in_stock < (i.quantity_sale -(select quantity_sale from deleted))
+			where k.id_prod = i.id_product )
 		begin
 			RAISERROR ('Данное количество отсутвует', 12,1)
 			ROLLBACK

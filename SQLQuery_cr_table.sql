@@ -61,7 +61,8 @@ create table sports.table_clients(
 	phone_number varchar(20) null,
 	discount_percentage int default(0) not null,
 	subscribe_news bit default(0) not null,
-	gender nvarchar(40) not null
+	gender nvarchar(40) not null,
+	date_of_registration date default(GETDATE()) not null,
 )
 go
 --изменяем (добавляем связь) таблицу о клиентах
@@ -139,7 +140,8 @@ create table sports.table_history_sale(
 	sale_price money default(0) not null,
 	id_seller int default(0) not null,
 	id_client int default(0) not null,
-	status_sale nvarchar(20) default('Выполнен') null
+	status_sale nvarchar(20) default('Выполнен') null,
+	manufacturer nvarchar(20) null
 )
 go
 
@@ -206,9 +208,8 @@ go
 insert into sports.table_sale(id_product,quantity_sale,
 								id_seller,id_client) 
 values
-(17,5,3,2)
+(40,1,2,1)
 go
-
 
 
 
